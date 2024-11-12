@@ -6,7 +6,7 @@ public class PlayerScript : MonoBehaviour
 {
     private float horizontal, vertical;
     private float speed = 5f;
-    private bool isFacingRight = true;
+    public static bool isFacingRight = true;
 
     [SerializeField] private Rigidbody2D rb;
     //[SerializeField] private Transform groundCheck;

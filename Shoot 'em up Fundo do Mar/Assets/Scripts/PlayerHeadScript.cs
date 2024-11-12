@@ -7,9 +7,6 @@ using UnityEngine.U2D.IK;
 public class PlayerHeadScript : MonoBehaviour
 {
 
-
-
-
     /*Se o mouseposition > playerposition {
         scale = 1
         rotation = entre 90 e -90
@@ -47,7 +44,7 @@ public class PlayerHeadScript : MonoBehaviour
         Flip();
     }
 
-    void Flip(){
+    public void Flip(){
         if(transform.eulerAngles.z > 90 && transform.eulerAngles.z < 270){
             transform.localScale = new Vector3(1,-1,1);
         }else{
