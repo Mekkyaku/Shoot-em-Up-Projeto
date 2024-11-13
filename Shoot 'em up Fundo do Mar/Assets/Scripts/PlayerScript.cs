@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -9,13 +10,20 @@ public class PlayerScript : MonoBehaviour
     public static bool isFacingRight = true;
 
     [SerializeField] private Rigidbody2D rb;
+    public static int healthPoints = 3;
+    private UnityEngine.Vector3 offset = new UnityEngine.Vector3(0, 2f, 0);
     //[SerializeField] private Transform groundCheck;
     //[SerializeField] private LayerMask groundLayer;
 
     // Start() roda antes da PRIMEIRA execução do Update()
     void Start()
     {
-       
+    }
+
+    void OnGUI(){
+        UnityEngine.Vector3 worldPlayerPos = Camera.main.WorldToScreenPoint(transform.position + offset);
+        worldPlayerPos.y = Screen.height - worldPlayerPos.y;
+        GUI.Label(new Rect(worldPlayerPos.x - 20, worldPlayerPos.y + 20, 100, 20), "HP: " + healthPoints);
     }
 
     // Update é mais utilizado para inputs, pois roda a cada frame.
@@ -23,9 +31,8 @@ public class PlayerScript : MonoBehaviour
     {
        horizontal = Input.GetAxisRaw("Horizontal");
        vertical = Input.GetAxisRaw("Vertical");
-       Debug.Log("Player: " + transform.position);
        Flip();
-
+        
     }
 
     //FixedUpdate é mais utilizado para física, pois roda a cada 0.02s
@@ -39,6 +46,14 @@ public class PlayerScript : MonoBehaviour
             UnityEngine.Vector3 localScale = transform.localScale;
             localScale.x *= -1f;
             transform.localScale = localScale;
+        }
+    }
+
+     private void OnTriggerEnter2D(Collider2D collision){
+        if(collision.gameObject.CompareTag("Enemy")){
+            healthPoints--;
+            
+
         }
     }
 
