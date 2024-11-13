@@ -30,6 +30,7 @@ public class PlayerHeadScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         // Posição do mouse em pixels
         Vector3 mousepos = Input.mousePosition;
 

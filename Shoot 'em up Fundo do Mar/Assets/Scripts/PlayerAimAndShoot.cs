@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using UnityEditor.Tilemaps;
 using UnityEngine;
@@ -11,21 +12,38 @@ public class PlayerAimAndShoot : MonoBehaviour
     [SerializeField] private Transform bulletSpawnPoint;
 
     private GameObject bulletInst;
-    private UnityEngine.Vector2 worldMousePos;
+    public GameObject[] allObjects;
+    public GameObject nearestObject;
+    private UnityEngine.Vector2 worldMousePos, worldEnemyPos;
     private UnityEngine.Vector2 direction;
+    float distance, nearestDistance;
+    public static bool autoShoot = false;
+
+    void Start(){
+        InvokeRepeating("HandleGunShooting", 2f, 2f);
+
+    }
 
     void Update()
     {
-        HandleGunRotation();
+        if(!autoShoot){
+            HandleGunRotation();
+        }
         Flip();
-        HandleGunShooting();
+        
     }
 
     private void HandleGunRotation(){
-        //rotate the gun towards the mouse position
-        worldMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        direction = (worldMousePos - (UnityEngine.Vector2)gun.transform.position).normalized;
-        gun.transform.right = direction;
+        if(!autoShoot){
+            //rotate the gun towards the mouse position
+            worldMousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            direction = (worldMousePos - (UnityEngine.Vector2)gun.transform.position).normalized;
+            gun.transform.right = direction;
+        }else{
+            direction = ((UnityEngine.Vector2)nearestObject.transform.position - (UnityEngine.Vector2)gun.transform.position).normalized;
+            gun.transform.right = direction;
+        }
+        
     }
 
     void Flip(){
@@ -43,13 +61,30 @@ public class PlayerAimAndShoot : MonoBehaviour
             }
         }
 
-        Debug.Log(gun.transform.right);
     }
 
     private void HandleGunShooting(){
-        if (Mouse.current.leftButton.wasPressedThisFrame){
-            //spawn bullet
-            bulletInst = Instantiate(bullet, bulletSpawnPoint.position, gun.transform.rotation);
+        allObjects = GameObject.FindGameObjectsWithTag("Enemy");
+        nearestDistance = 10000;
+        if(allObjects.Length > 0){
+            for (int i = 0; i < allObjects.Length; i++){
+                distance = UnityEngine.Vector3.Distance(this.transform.position, allObjects[i].transform.position);
+
+                if(distance < nearestDistance){
+                    nearestObject = allObjects[i];
+                    nearestDistance = distance;
+                }
+            }
+
+            if(autoShoot){
+                HandleGunRotation();
+            }
         }
+
+
+        bulletInst = Instantiate(bullet, bulletSpawnPoint.position, gun.transform.rotation);  
+
     }
+
+
 }

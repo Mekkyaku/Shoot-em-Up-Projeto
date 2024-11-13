@@ -28,6 +28,12 @@ public class BulletBehavior : MonoBehaviour
             
             //destroy the bullet
             Destroy(gameObject);
+            Debug.Log(collision.gameObject.layer);
+            if(collision.gameObject.layer == 6){
+                EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
+                enemy.healthPoints--;
+
+            }
         }
     }
 

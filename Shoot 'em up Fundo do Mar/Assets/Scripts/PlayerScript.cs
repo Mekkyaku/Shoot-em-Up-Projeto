@@ -32,6 +32,19 @@ public class PlayerScript : MonoBehaviour
        horizontal = Input.GetAxisRaw("Horizontal");
        vertical = Input.GetAxisRaw("Vertical");
        Flip();
+       if(Input.GetButtonDown("Fire1")){
+            if(!PlayerAimAndShoot.autoShoot){
+                PlayerAimAndShoot.autoShoot = true;
+            }
+            else{
+                PlayerAimAndShoot.autoShoot = false;
+            }
+            Debug.Log(PlayerAimAndShoot.autoShoot);
+        }
+
+        if(healthPoints <= 0){
+            Destroy(gameObject);
+        }
         
     }
 
@@ -50,6 +63,7 @@ public class PlayerScript : MonoBehaviour
     }
 
      private void OnTriggerEnter2D(Collider2D collision){
+        
         if(collision.gameObject.CompareTag("Enemy")){
             healthPoints--;
             

@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ground
+  - Enemy
+  - EnemySpawner
   layers:
   - Default
   - TransparentFX
@@ -12,12 +14,12 @@ TagManager:
   - 
   - Water
   - UI
+  - Enemy
   - Ground
-  - 
-  - 
+  - Player
   - 
   - PlayerProjectile
-  - 
+  - EnemySpawner
   - 
   - 
   - 

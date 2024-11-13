@@ -10,6 +10,9 @@ public class EnemyScript : MonoBehaviour
     private Vector2 worldPlayerPos;
     private Vector2 direction;
     GameObject player;
+    private Collider2D playerCol;
+    public int healthPoints = 2;
+    
 
     private void Awake()
     {
@@ -20,6 +23,9 @@ public class EnemyScript : MonoBehaviour
     }
     void Update(){
         WalkIntoPlayer();
+        if(healthPoints <= 0){
+            Destroy(gameObject);
+        }
     }
 
     void WalkIntoPlayer(){
