@@ -12,6 +12,7 @@ public class EnemyScript : MonoBehaviour
     GameObject player;
     private Collider2D playerCol;
     public int healthPoints = 2;
+    private bool isFacingRight;
     
 
     private void Awake()
@@ -35,6 +36,12 @@ public class EnemyScript : MonoBehaviour
             rb.linearVelocity = direction * speed;
         }else{
             rb.linearVelocity = new UnityEngine.Vector2(0, 0);
+        }
+        if(direction.x > 0 && isFacingRight || direction.x < 0 && !isFacingRight){
+            isFacingRight = !isFacingRight;
+            UnityEngine.Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
         }
     }
 

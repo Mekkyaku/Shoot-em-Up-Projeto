@@ -5,20 +5,31 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-    private float horizontal, vertical;
-    private float speed = 4f;
-    public static bool isFacingRight = true;
+    #region Variáveis físicas
+        private float horizontal, vertical;
+        private float speed = 4f;
+        public static bool isFacingRight = true;
 
-    [SerializeField] private Rigidbody2D rb;
-    public static int healthPoints = 3;
-    private UnityEngine.Vector3 offset = new UnityEngine.Vector3(0, 2f, 0);
-    public static bool gamePause = false;
-    //[SerializeField] private Transform groundCheck;
-    //[SerializeField] private LayerMask groundLayer;
+        [SerializeField] private Rigidbody2D rb;
+        public static int healthPoints = 3;
+    #endregion
+    #region Utilidades do jogo
+        private UnityEngine.Vector3 offset = new UnityEngine.Vector3(0, 2f, 0);
+        public static bool gamePause = false;
+    #endregion
+    #region Escolha de personagem
+        public static int character;
+        private SpriteRenderer sprRenderer;
+        private Sprite spriteC;
+    #endregion
 
     // Start() roda antes da PRIMEIRA execução do Update()
     void Start()
     {
+        character = PlayerPrefs.GetInt("character");
+        sprRenderer = GetComponent<SpriteRenderer>();
+        ChosenCharacter();
+        Debug.Log(character);
     }
 
     void OnGUI(){
@@ -76,6 +87,38 @@ public class PlayerScript : MonoBehaviour
             healthPoints--;
             
 
+        }
+    }
+
+    private void ChosenCharacter(){
+        switch(character){
+            case 1:
+                spriteC = Resources.Load<Sprite>("Sprites/Construtor");
+                sprRenderer.sprite = spriteC;
+                break;
+            case 2:
+                spriteC = Resources.Load<Sprite>("Sprites/Natureza");
+                sprRenderer.sprite = spriteC;
+                break;
+            case 3:
+                spriteC = Resources.Load<Sprite>("Sprites/Nerd");
+                sprRenderer.sprite = spriteC;
+                break;
+            case 4:
+                spriteC = Resources.Load<Sprite>("Sprites/Domador");
+                sprRenderer.sprite = spriteC;
+                break;
+            case 5:
+                spriteC = Resources.Load<Sprite>("Sprites/Encantador");
+                sprRenderer.sprite = spriteC;
+                break;
+        }
+
+        if(spriteC){
+            Debug.Log(spriteC);
+            Debug.Log("Sprite carregada com sucesso!");
+        }else{
+            Debug.Log("Sprite não foi carregada!");
         }
     }
 
