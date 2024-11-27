@@ -2,36 +2,53 @@ using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
-    #region Variáveis físicas
+    #region Physics variables
         private float horizontal, vertical;
         private float speed = 4f;
         public static bool isFacingRight = true;
 
         [SerializeField] private Rigidbody2D rb;
-        public static int healthPoints = 3;
     #endregion
-    #region Utilidades do jogo
+    #region Game utility
         private UnityEngine.Vector3 offset = new UnityEngine.Vector3(0, 2f, 0);
-        public static bool gamePause = false;
+        public static bool gamePause;
+        public static float xp, xpMax;
+        public static int level;
+        public static int healthPoints;
     #endregion
     #region Escolha de personagem
+        [SerializeField] GameObject gun;
+        [SerializeField] GameObject bullet;
+        [SerializeField] GameObject UI, lvlUp;
         public static int character;
-        private SpriteRenderer sprRenderer;
-        private Sprite spriteC;
+        private SpriteRenderer sprRenderer, sprRendererW, sprRendererB;
+        private Image[] sprRendererUI;
+        private Sprite spriteC, spriteW;
     #endregion
 
-    // Start() roda antes da PRIMEIRA execução do Update()
+    // Start() roda uma vez e antes da PRIMEIRA execução do Update()
     void Start()
     {
-        character = PlayerPrefs.GetInt("character");
-        sprRenderer = GetComponent<SpriteRenderer>();
+        gamePause = false;
+        xp = 0; xpMax = 5; level = 0;
+        healthPoints = 3;
+        #region GETTING ALL SPRITES AND SETTING THEM
+            character = PlayerPrefs.GetInt("character");
+            sprRenderer = GetComponent<SpriteRenderer>();
+            sprRendererW = gun.GetComponent<SpriteRenderer>();
+            sprRendererB = bullet.GetComponent<SpriteRenderer>();
+            sprRendererUI = UI.GetComponentsInChildren<Image>();
+        #endregion
         ChosenCharacter();
         Debug.Log(character);
     }
 
+    //DEBUG ONLY
     void OnGUI(){
         if(gameObject){
             UnityEngine.Vector3 worldPlayerPos = Camera.main.WorldToScreenPoint(transform.position + offset);
@@ -43,32 +60,49 @@ public class PlayerScript : MonoBehaviour
     // Update é mais utilizado para inputs, pois roda a cada frame.
     void Update()
     {
+
         if(healthPoints > 0){
-            horizontal = Input.GetAxisRaw("Horizontal");
-            vertical = Input.GetAxisRaw("Vertical");
-            Flip();
-            if(Input.GetButtonDown("Fire1")){
-                if(!PlayerAimAndShoot.autoShoot){
-                    PlayerAimAndShoot.autoShoot = true;
+            #region SHOOT AND MOVEMENT
+                horizontal = Input.GetAxisRaw("Horizontal");
+                vertical = Input.GetAxisRaw("Vertical");
+                Flip();
+                if(Input.GetButtonDown("Fire1")){
+                    if(!PlayerAimAndShoot.autoShoot){
+                        PlayerAimAndShoot.autoShoot = true;
+                    }
+                    else{
+                        PlayerAimAndShoot.autoShoot = false;
+                    }
                 }
-                else{
-                    PlayerAimAndShoot.autoShoot = false;
-                }
-                Debug.Log(PlayerAimAndShoot.autoShoot);
-            }
+            #endregion
         }else{
+            //PLAYER'S DEATH
             if(!gamePause){
                 Destroy(gameObject);
                 gamePause = true;
+                SceneManager.LoadSceneAsync(0);
             }
         }
         
+        #region UI Control
+            if(UI.activeSelf == true){
+                gamePause = false;
+            }else{
+                gamePause = true;
+            }
+        #endregion
+
+        LevelUp();
+        Debug.Log("XP: " + xp);
+        Debug.Log("XP Máximo: " + xpMax);
     }
 
     //FixedUpdate é mais utilizado para física, pois roda a cada 0.02s
     private void FixedUpdate(){
         if(!gamePause){
             rb.linearVelocity = new UnityEngine.Vector2(horizontal * speed, vertical * speed);
+        }else{
+            rb.linearVelocity = new UnityEngine.Vector2(0, 0);
         }
     }
 
@@ -81,35 +115,43 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-     private void OnCollisionEnter2D(Collision2D collision){
-        
-        if(collision.gameObject.CompareTag("Enemy")){
-            healthPoints--;
-            
-
-        }
-    }
-
     private void ChosenCharacter(){
+        //Probably i'll change that, maybe switch all this code to AimAndShoot instead of letting it here
         switch(character){
+            //Constructor case
             case 1:
-                spriteC = Resources.Load<Sprite>("Sprites/Construtor");
+                spriteC = Resources.Load<Sprite>("Sprites/Constructor");
                 sprRenderer.sprite = spriteC;
+                spriteW = Resources.Load<Sprite>("Sprites/Weapons/InGame/Brick");
+                sprRendererW.sprite = spriteW;
+                //Here we use the same sprite than the weapon cause its the same. 
+                //Maybe when throwing the brick it disappear for a second of the hand of the player then it appears again.
+                sprRendererB.sprite = spriteW;
+                //Here we need to add a condition that compares the order of the chosen ability to add its image in order on the HUD. sprRendererUI.length maybe
+                sprRendererUI[1].sprite = Resources.Load<Sprite>("Sprites/Weapons/Frames/BrickFrame");
                 break;
+
+            //Nature case
             case 2:
-                spriteC = Resources.Load<Sprite>("Sprites/Natureza");
+                spriteC = Resources.Load<Sprite>("Sprites/Nature");
                 sprRenderer.sprite = spriteC;
                 break;
+
+            //Nerd case
             case 3:
                 spriteC = Resources.Load<Sprite>("Sprites/Nerd");
                 sprRenderer.sprite = spriteC;
                 break;
+
+            //Handler case
             case 4:
-                spriteC = Resources.Load<Sprite>("Sprites/Domador");
+                spriteC = Resources.Load<Sprite>("Sprites/Handler");
                 sprRenderer.sprite = spriteC;
                 break;
+
+            //Enchanter case
             case 5:
-                spriteC = Resources.Load<Sprite>("Sprites/Encantador");
+                spriteC = Resources.Load<Sprite>("Sprites/Enchanter");
                 sprRenderer.sprite = spriteC;
                 break;
         }
@@ -119,6 +161,16 @@ public class PlayerScript : MonoBehaviour
             Debug.Log("Sprite carregada com sucesso!");
         }else{
             Debug.Log("Sprite não foi carregada!");
+        }
+    }
+
+    private void LevelUp(){
+        if(xp >= xpMax){
+            xp = 0;
+            xpMax = xpMax * 1.5f;
+            gamePause = true;
+            lvlUp.SetActive(true);
+            UI.SetActive(false);
         }
     }
 

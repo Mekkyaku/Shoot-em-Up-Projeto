@@ -64,25 +64,27 @@ public class PlayerAimAndShoot : MonoBehaviour
     }
 
     private void HandleGunShooting(){
-        allObjects = GameObject.FindGameObjectsWithTag("Enemy");
-        nearestDistance = 10000;
-        if(allObjects.Length > 0){
-            for (int i = 0; i < allObjects.Length; i++){
-                distance = UnityEngine.Vector3.Distance(this.transform.position, allObjects[i].transform.position);
+        if(!PlayerScript.gamePause){
+            allObjects = GameObject.FindGameObjectsWithTag("Enemy");
+            nearestDistance = 10000;
+            if(allObjects.Length > 0){
+                for (int i = 0; i < allObjects.Length; i++){
+                    distance = UnityEngine.Vector3.Distance(this.transform.position, allObjects[i].transform.position);
 
-                if(distance < nearestDistance){
-                    nearestObject = allObjects[i];
-                    nearestDistance = distance;
+                    if(distance < nearestDistance){
+                        nearestObject = allObjects[i];
+                        nearestDistance = distance;
+                    }
+                }
+
+                if(autoShoot){
+                    HandleGunRotation();
                 }
             }
 
-            if(autoShoot){
-                HandleGunRotation();
-            }
+
+            bulletInst = Instantiate(bullet, bulletSpawnPoint.position, gun.transform.rotation);  
         }
-
-
-        bulletInst = Instantiate(bullet, bulletSpawnPoint.position, gun.transform.rotation);  
 
     }
 

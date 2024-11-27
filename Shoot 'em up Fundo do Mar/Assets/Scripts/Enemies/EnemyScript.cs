@@ -10,6 +10,7 @@ public class EnemyScript : MonoBehaviour
     private Vector2 worldPlayerPos;
     private Vector2 direction;
     GameObject player;
+    [SerializeField] GameObject xp;
     private Collider2D playerCol;
     public int healthPoints = 2;
     private bool isFacingRight;
@@ -25,24 +26,35 @@ public class EnemyScript : MonoBehaviour
     void Update(){
         WalkIntoPlayer();
         if(healthPoints <= 0){
+            Instantiate(xp, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
 
     void WalkIntoPlayer(){
-        if(!PlayerScript.gamePause){
+        if(player && !PlayerScript.gamePause){
             worldPlayerPos = player.transform.position;
             direction = (worldPlayerPos - (UnityEngine.Vector2)this.transform.position).normalized;
             rb.linearVelocity = direction * speed;
+
+            if(direction.x > 0 && isFacingRight || direction.x < 0 && !isFacingRight){
+                isFacingRight = !isFacingRight;
+                UnityEngine.Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
         }else{
             rb.linearVelocity = new UnityEngine.Vector2(0, 0);
         }
-        if(direction.x > 0 && isFacingRight || direction.x < 0 && !isFacingRight){
-            isFacingRight = !isFacingRight;
-            UnityEngine.Vector3 localScale = transform.localScale;
-            localScale.x *= -1f;
-            transform.localScale = localScale;
-        }
+
     }
 
+    private void OnCollisionEnter2D(Collision2D collision){
+        
+        if(collision.gameObject.CompareTag("Player")){
+            PlayerScript.healthPoints--;
+            
+
+        }
+    }
 }
