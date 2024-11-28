@@ -4,7 +4,6 @@ using UnityEngine;
 public class BulletBehavior : MonoBehaviour
 {
     [SerializeField] private float speed = 15f;
-    [SerializeField] private float destroyTime = 3f;
     [SerializeField] private LayerMask whatDestroysBullet;
     private Rigidbody2D rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -12,6 +11,9 @@ public class BulletBehavior : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         SetDestroyTime();
+    }
+
+    void FixedUpdate(){
         SetStraightVelocity();
     }
 
@@ -27,7 +29,7 @@ public class BulletBehavior : MonoBehaviour
             //damage enemy
             
             //destroy the bullet
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             Debug.Log(collision.gameObject.layer);
             if(collision.gameObject.layer == 6){
                 EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
@@ -42,6 +44,6 @@ public class BulletBehavior : MonoBehaviour
     }
 
     private void SetDestroyTime(){
-        Destroy(gameObject, destroyTime);
+        gameObject.SetActive(false);
     }
 }

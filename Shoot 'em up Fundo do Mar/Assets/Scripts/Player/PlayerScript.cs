@@ -93,8 +93,8 @@ public class PlayerScript : MonoBehaviour
         #endregion
 
         LevelUp();
-        Debug.Log("XP: " + xp);
-        Debug.Log("XP Máximo: " + xpMax);
+        //Debug.Log("XP: " + xp);
+        //Debug.Log("XP Máximo: " + xpMax);
     }
 
     //FixedUpdate é mais utilizado para física, pois roda a cada 0.02s
